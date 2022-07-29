@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>注册</title>
+  <meta name="description" content="Professional certification regidter-page">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="robots" content="all,follow">
+  <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/4.2.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,700">
+  <link rel="stylesheet" href="../static/css/style.default.css" id="theme-stylesheet">
+  <link rel="stylesheet" href="../static/css/layui.css">
+</head>
+
+<body>
+  <div class="page login-page">
+    <div class="container d-flex align-items-center">
+      <div class="form-holder has-shadow">
+        <div class="row">
+          <!-- Logo & Information Panel-->
+          <div class="col-lg-6">
+            <div class="info d-flex align-items-center">
+              <div class="content">
+                <div class="logo">
+                  <h1>专业认证信息管理系统</h1>
+                </div>
+                <p>西安邮电大学计算机学院</p>
+              </div>
+            </div>
+          </div>
+          <!-- Form Panel    -->
+          <div class="col-lg-6 bg-white">
+            <div class="form d-flex align-items-center">
+              <div class="content">
+                <form id="test_form" method="post" class="layui-form">
+                  <div class="form-group">
+                    <input id="register-usernum" type="text" name="registerUsernum" lay-verify="Usernum"
+                      placeholder="教工号" class="input-material" autocomplete="off">
+                  </div>
+                  <div class="form-group">
+                    <input id="register-username" type="text" name="registerUsername" lay-verify="username"
+                      placeholder="用户名" class="input-material" autocomplete="off">
+                  </div>
+                  <div class="form-group">
+                    <input id="register-email" type="email" name="registerEmail" lay-verify="email_required|email"
+                      placeholder="邮箱" class="input-material" autocomplete="off">
+                  </div>
+                  <div class="form-group">
+                    <input id="register-Verification_code" type="text" name="registerVerification_code"
+                      placeholder="验证码" class="input-material" autocomplete="off" style="width: 280px;">
+                    <button type="button" class="btn btn-primary" style="float: right;"
+                      id="send_emile_code_btn">获取验证码</button>
+                  </div>
+                  <div class="form-group">
+                    <input id="register-password" type="password" name="registerPassword" lay-verify="pass"
+                      placeholder="密码" class="input-material" autocomplete="off">
+                  </div>
+                  <div class="form-group">
+                    <input id="register-confirm-password" type="password" name="registerConfirmPassword"
+                      lay-verify="confirm_required" placeholder="确认密码" class="input-material" autocomplete="off">
+                  </div>
+                  <button lay-submit id="regidter" type="submit" name="registerSubmit" lay-filter="submit_button"
+                    class="btn btn-primary">注册</button>
+                  <div style="margin-top: 10px;float: right;">
+                    <small>已有账号？</small><a href="{{ url_for('login') }}" class="signup">登录</a>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="../static/layui.js"></script>
+  <script type="text/javascript" src="../static/jquery-3.1.0.min.js"></script>
+  <script>
+    layui.use(['form', 'jquery'], function () {
+      var form = layui.form
+      //各种基于事件的操作，下面会有进一步介绍
+      form.verify({
+        Usernum: function (value, item) { //value：表单的值、item：表单的DOM对象
+          if (!value) {
+            return '教工号不能为空';
+          }
+          if (!new RegExp("^[0-9]*$").test(value)) {
+            return '教工号只能输入数字';
+          }
+        },
+        username: function (value, item) { //value：表单的值、item：表单的DOM对象
+          if (!value) {
+            return '用户名不能为空';
+          }
+          if (!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)) {
+            return '用户名不能有特殊字符';
+          }
+        }
+        , pass: function (value, item) {
+          if (!value) {
+            return '密码不能为空';
+          }
+          if (!new RegExp("[^\S]{6,12}$").test(value)) {
+            return '密码必须6到12位，且不能出现空格';
+          }
+        }
+        , email_required: function (value, item) {
+          if (!value) {
+            return '邮箱不能为空';
+          }
+        }
+        , Verification_code_required: function (value, item) {
+          if (!value) {
+            return '请输入验证码';
+          }
+        }
+        , confirm_required: function (value, item) {
+          if (!value) {
+            return '请确认密码';
+          }
+        }
+      });
+      form.on("submit(submit_button)", function (data) {
+        function login() {
+          window.location.href = "{{url_for('login')}}"
+        }
+        if (data.field.registerConfirmPassword == data.field.registerPassword) {
+          $.ajax({
+            type: "POST",
+            url: "{{url_for('register_post')}}",
+            data: JSON.stringify(data.field),
+            contentType: 'application/json',
+            success: function (data) {
+              if (data['success'] == 200) {
+                layer.msg(data['msg'], { icon: 1 }, { time: 2000 });
+                setTimeout(function () { login(); }, 2000);
+              }
+              else {
+                layer.msg(data['msg'], { icon: 2 }, { time: 2000 });
+              }
+            },
+            error: function (data) {
+              layer.msg('连接网络失败，请检查网络设置或联系管理员', { icon: 2 }, { time: 2000 });
+            }
+          });
+        }
+        else layer.msg('密码输入不一致', { icon: 2 }, { time: 2000 });
+        return false;
+      });
+    });
+    $("#send_emile_code_btn").click(function (data) {
+      set_time()
+      var email = $("#register-email").val();
+      if (email) {
+        $.ajax({
+          type: "get",
+          url: "{{url_for('email_captcha')}}",
+          async: false,
+          data: {
+            'email': email,
+          },
+          contentType: 'application/json',
+          dataType: "json",
+          success: function (data) {
+            layer.msg('发送成功');
+          },
+          error: function (data) {
+            layer.msg('连接网络失败，请检查网络设置或联系管理员', { icon: 2 }, { time: 2000 });
+          }
+        });
+      }
+      else layer.msg('邮箱有误')
+    });
+    var countdown = 60;
+    function set_time() {
+      var btn = $("#send_emile_code_btn");
+      if (countdown == 0) {
+        btn.removeAttr("disabled");
+        btn.text("获取验证码");
+        countdown = 60;
+        return;
+      } else {
+        btn.attr("disabled", true);
+        btn.text("重新发送(" + countdown + ")");
+        countdown--;
+      }
+      setTimeout(function () {
+        set_time();
+      }, 1000)
+    }
+  </script>
+</body>
+
+</html>

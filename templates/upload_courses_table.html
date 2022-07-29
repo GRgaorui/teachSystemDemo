@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../static/css/layui.css">
+  <link rel="stylesheet" href="../static/css/custom.css">
+  <link rel="stylesheet" href="../static/css/style.default.css">
+  <style>
+    .file-box {
+      position: relative;
+      width: 340px;
+      margin: 20px;
+    }
+
+    .txt {
+      height: 33px;
+      line-height: 33px;
+      border: 1px solid #cdcdcd;
+      width: 180px;
+    }
+
+    .file {
+      position: absolute;
+      top: 0;
+      right: 85px;
+      height: 30px;
+      line-height: 30px;
+      filter: alpha();
+      opacity: 0;
+      width: 254px
+    }
+  </style>
+</head>
+
+<body>
+  <header class="page-header">
+    <div class="container-fluid">
+      <h2 class="no-margin-bottom" id="header_cont">上传课表</h2>
+    </div>
+  </header>
+  <div class="file-box">
+    <form id="uploadForm">
+      <input type="text" id="textfield" class="txt" />
+      <input type="button" class="layui-btn" value="浏览..." />
+      <input type="file" name="file" class="file" id="fileField"
+        onchange="document.getElementById('textfield').value=this.files[0].name" />
+      <button type="button" class="layui-btn" id="up_class_table">上传</button>
+    </form>
+    <span style="color:red">* </span><span style="font-size: small; color: red;">本次上传会覆盖上一次的结果</span>
+  </div>
+  <div class="layui-form" style="margin-top: -10px;">
+    <table class="layui-table" lay-size="lg" id="class_table" lay-filter="test"></table>
+  </div>
+</body>
+<script type="text/javascript" src='../static/xlsx.full.min.js'></script>
+<script type="text/javascript" src='../static/layui.js'></script>
+<script>
+  const result = [];
+  //首先监听input框的变动，选中一个新的文件会触发change事件
+  document.querySelector("#fileField").addEventListener("change", function () {
+    //获取到选中的文件
+    var file = document.querySelector("#fileField").files[0];
+    var type = file.name.split('.');
+    if (type[type.length - 1] !== 'xlsx' && type[type.length - 1] !== 'xls') {
+      alert('只能选择excel文件导入');
+      return false;
+    }
+    const reader = new FileReader();
+    reader.readAsBinaryString(file);
+    reader.onload = (e) => {
+      const data = e.target.result;
+      const zzexcel = window.XLS.read(data, {
+        type: 'binary'
+      });
+      for (let i = 0; i < zzexcel.SheetNames.length; i++) {
+        const newData = window.XLS.utils.sheet_to_json(zzexcel.Sheets[zzexcel.SheetNames[i]]);
+        result.push(...newData)
+      }
+    }
+    layui.use(['element', 'form', 'table', 'jquery'], function () {
+      var table = layui.table
+        , $ = layui.jquery;
+      table.render({
+        elem: '#class_table'
+        , data: result
+        , page: false
+        , loading: false
+        , LAY_CHECKED: true
+        , cellMinWidth: 100
+        , cols: [[ //表头
+          { field: '课程名称', title: '课程名称' }
+          , { field: '学院', title: '学院' }
+          , { field: '专业', title: '专业' }
+          , { field: '班级', title: '班级' }
+          , { field: '授课教师', title: '授课教师' }
+          , { field: '课程负责人', title: '课程负责人' }
+          , { field: '专业负责人', title: '专业负责人' }
+        ]]
+      });
+      $("#up_class_table").click(function () {
+        $.ajax({
+          type: "post",
+          url: "{{url_for('upload_courses_table_updata')}}",
+          async: false,
+          data: JSON.stringify(result),
+          contentType: 'application/json',
+          dataType: "json",
+          success: function (data) {
+            layer.msg('上传成功', { icon: 1 }, { time: 2000 });
+          },
+          error: function (data) {
+            layer.msg('连接网络失败，请检查网络设置或联系管理员', { icon: 2 }, { time: 2000 });
+          }
+        });
+      });
+    });
+  });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../static/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/css/custom.css">
+    <link rel="stylesheet" href="../static/css/style.default.css">
+</head>
+
+<body>
+    <div class="layui-upload" style="padding: 20px;">
+        <button type="button" class="layui-btn layui-btn-normal" id="testList">选择文件</button>
+        <button type="button" class="layui-btn" id="testListAction">开始上传</button>
+        <div><span style="color:red">* </span><span style="font-size: small; color: red;">只支持预览图片</span></div>
+        <div class="layui-upload-list">
+            <table class="layui-table">
+                <thead>
+                    <tr>
+                        <th>文件名</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="demoList">
+                    {% for res in payload %}
+                    <form action="up_file_se/{{res.id}}">
+                        <tr id="{{res.id}}">
+                            <td>{{res.Material_upload}}</td>
+                            <td>已上传</td>
+                            <td>
+                                <a href="up_file_se/{{res.id}}" class="layui-btn layui-btn-xs">查看</a>
+                                <button type="button" class="layui-btn layui-btn-xs layui-btn-danger delete">删除</button>
+                            </td>
+                        </tr>
+                    </form>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="../static/layui.js" charset="utf-8"></script>
+    <script>
+        layui.use(['upload', 'layer'], function () {
+            var $ = layui.jquery
+                , upload = layui.upload
+                , layer = layui.layer;
+            var demoListView = $('#demoList')
+                , uploadListIns = upload.render({
+                    elem: '#testList'
+                    , url: "{{url_for('teacher_upload_updata')}}" //改成您自己的上传接口
+                    , multiple: true
+                    , auto: false
+                    , accept: 'file'
+                    , bindAction: '#testListAction'
+                    , choose: function (obj) {
+                        var files = this.files = obj.pushFile(); //将每次选择的文件追加到文件队列
+                        //读取本地文件
+                        obj.preview(function (index, file, result) {
+                            var tr = $(['<tr id="upload-' + index + '">'
+                                , '<td>' + file.name + '</td>'
+                                , '<td>等待上传</td>'
+                                , '<td>'
+                                , '<button class="layui-btn layui-btn-xs demo-reload layui-hide">重传</button>'
+                                , '<button class="layui-btn layui-btn-xs demo-see">预览</button>'
+                                , '<button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>'
+                                , '</td>'
+                                , '</tr>'].join(''));
+                            //单个重传
+                            tr.find('.demo-reload').on('click', function () {
+                                obj.upload(index, file);
+                            });
+                            //删除
+                            tr.find('.demo-delete').on('click', function () {
+                                delete files[index]; //删除对应的文件
+                                tr.remove();
+                                uploadListIns.config.elem.next()[0].value = ''; //清空 input file 值，以免删除后出现同名文件不可选
+                            });
+
+                            tr.find('.demo-see').on('click', function () {
+                                var index = file.name.lastIndexOf(".");
+                                var ext = file.name.substr(index + 1);
+                                if (!isAssetTypeAnImage(ext)) {
+                                    layer.msg('暂不支持该文件预览', { icon: 2 }, { time: 2000 });
+                                }
+                                else {
+                                    var img = new Image();
+                                    img.src = result;
+                                    img.onload = function () {
+                                        var width = img.width;
+                                        var height = img.height;
+                                        var m = width / height;
+                                        if (width > height) {
+                                            width = 480;
+                                            height = width / m;
+                                        }
+                                        else {
+                                            height = 480;
+                                            width = height * m;
+                                        }
+                                        var imgHtml = '<div style="width:480px;height:480px;"><div style= "width:' + width + 'px;height:' + height + 'px;position: absolute;  top: 0;  right: 0;  bottom: 0;  left: 0;  margin: auto;"><img src="' + result + '" alt="' + file.name + '" class="layui-upload-img;"style= "width:100%;height:100%;"></div></div>'
+                                        layer.open({
+                                            type: 1,
+                                            shade: 0.8,
+                                            offset: 'auto',
+                                            area: ['480px', '480px'], //有时间的话，做一下适应窗口大小。
+                                            shadeClose: true,
+                                            scrollbar: false,
+                                            title: false,
+                                            content: imgHtml,
+                                            resize: false
+                                        });
+                                    }
+                                }
+
+                            });
+                            demoListView.append(tr);
+                        });
+                    }
+                    , done: function (res, index, upload) {
+                        if (res.code == 0) { //上传成功
+                            var tr = demoListView.find('tr#upload-' + index)
+                                , tds = tr.children();
+                            tds.eq(1).html('<span style="color: #5FB878;">上传成功</span>');
+                            tds.eq(2).find('.demo-reload').addClass('layui-hide'); //隐藏重传
+                            return delete this.files[index]; //删除文件队列已经上传成功的文件
+                        }
+                        this.error(index, upload);
+                    }
+                    , error: function (index, upload) {
+                        var tr = demoListView.find('tr#upload-' + index)
+                            , tds = tr.children();
+                        tds.eq(1).html('<span style="color: #FF5722;">上传失败</span>');
+                        tds.eq(2).find('.demo-reload').removeClass('layui-hide'); //显示重传
+                    }
+                });
+            var TaskType = '';
+            $(".delete").click(function () {
+                TaskType = $(this).closest("tr");
+                $.ajax({
+                    type: "get",
+                    url: "{{url_for('up_file_de')}}",
+                    data: {
+                        'file_id': TaskType[0].id,
+                    },
+                    contentType: 'application/json',
+                    success: function (data) {
+                        if (data.code == 0) {
+                            layer.msg('删除成功', { icon: 1 }, { time: 2000 });
+                            TaskType.remove()
+                        }
+                        else {
+                            layer.msg('删除失败', { icon: 2 }, { time: 2000 });
+                        }
+                    },
+                    error: function (data) {
+                        layer.msg('连接网络失败，请检查网络设置或联系管理员', { icon: 2 }, { time: 2000 });
+                    }
+                });
+            })
+        });
+        function isAssetTypeAnImage(ext) {
+            return ['png', 'jpg', 'jpeg', 'gif'].indexOf(ext.toLowerCase()) !== -1;
+        }
+    </script>
+</body>
+
+</html>

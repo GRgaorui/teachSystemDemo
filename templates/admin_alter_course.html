@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../static/css/layui.css" media="all">
+</head>
+
+<body>
+    <div style="margin-left: 50px;">
+        <form name="mainFrame" class="layui-form" action="{{url_for('admin_alter_course_updata')}}" lay-filter="alter_course_info"
+            style="width:350px; height: 490px;">
+            <div class="layui-form-item" style="margin-top: 10px;">
+                <label class="layui-form-label">ID</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="id" lay-verify="title" autocomplete="off" placeholder="ID"
+                        class="layui-input" value="{{result.id}}" disabled="disabled">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">课程名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="Course_name" lay-verify="title" autocomplete="off" placeholder="课程名称"
+                        class="layui-input" value="{{result.Course_name}}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">学院</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="Course_college" lay-verify="title" autocomplete="off" placeholder="学院"
+                        class="layui-input" value="{{result.Course_college}}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">专业</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="Course_major" lay-verify="title" autocomplete="off" placeholder="专业"
+                        class="layui-input" value="{{result.Course_major}}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">班级</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="Course_class" lay-verify="title" autocomplete="off" placeholder="班级"
+                        class="layui-input" value="{{result.Course_class}}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">授课教师</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="Course_teacher" lay-verify="title" autocomplete="off" placeholder="授课教师"
+                        class="layui-input" value="{{result.Course_teacher}}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">课程负责人</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="Course_leader" lay-verify="title" autocomplete="off" placeholder="课程负责人"
+                        class="layui-input" value="{{result.Course_leader}}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">专业负责人</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="Major_leader" lay-verify="title" autocomplete="off" placeholder="专业负责人"
+                        class="layui-input" value="{{result.Major_leader}}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">提交</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="../static/layui.js" charset="utf-8"></script>
+    <script>
+        layui.use(['form', 'layedit', 'laydate', 'jquery'], function () {
+            var form = layui.form
+                , layer = layui.layer
+                , layedit = layui.layedit
+                , laydate = layui.laydate
+                , $ = layui.jquery
+            //监听提交
+            form.on('submit(demo1)', function (data) {
+                parent.location.reload(true);
+                var index = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(index);
+            });
+        });
+    </script>
+
+</body>
+
+</html>

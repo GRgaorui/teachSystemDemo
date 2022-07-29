@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="../static/css/layui.css">
+  <link rel="stylesheet" href="../static/css/custom.css">
+  <link rel="stylesheet" href="../static/css/style.default.css">
+</head>
+
+<body>
+  <header class="page-header">
+    <div class="container-fluid">
+      <h2 class="no-margin-bottom" id="header_cont">修改课表</h2>
+    </div>
+  </header>
+  <div class="layui-anim layui-anim-upbit">
+    <div style="margin-left: 20px;margin-top: 15px;">
+      <form class="layui-form" action="">
+        <div class="layui-input-inline">
+          <input type="text" autocomplete="off" class="layui-input" placeholder="请输入课程名称">
+        </div>
+        <div class="layui-inline">
+          <button class="layui-btn">搜索</button>
+        </div>
+      </form>
+    </div>
+    <div>
+      <form class="layui-form" id="fromId" action="#">
+        <div style="padding: 15px;" class="layui-anim layui-anim-upbit">
+          <div class="layui-form">
+            <table class="layui-hide" id="alter_course_table" lay-filter="admin_course_info_table"></table>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+      </script>
+  <script src="../static/layui.js"></script>
+  <script>
+    layui.use(['table', 'jquery', 'layer', 'laypage', 'form', 'laytpl'], function () {
+      var $ = layui.jquery
+        , layer = layui.layer //弹层
+        , table = layui.table
+        , laypage = layui.laypage //分页
+        , form = layui.form
+        , laytpl = layui.laytpl;
+      table.render({
+        elem: '#alter_course_table'
+        , url: "{{url_for('admin_course_table_getdata')}}"
+        , page: {
+          layout: ['limit', 'count', 'prev', 'page', 'next']
+          , groups: 1
+          , first: false
+          , last: false
+        }
+        , loading: false
+        , LAY_CHECKED: true
+        , cols: [[
+          { field: 'id', title: 'ID', width: 100 }
+          , { field: 'Course_name', title: '课程名称' }
+          , { field: 'Course_college', title: '学院' }
+          , { field: 'Course_major', title: '专业', width: 150 }
+          , { field: 'Course_class', title: '班级' }
+          , { field: 'Course_teacher', title: '授课老师' }
+          , { field: 'Course_leader', title: '课程负责人' }
+          , { field: 'Major_leader', title: '专业负责人' }
+          , { fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150 }
+        ]]
+      });
+      table.on('tool(admin_course_info_table)', function (obj) {
+        var data = obj.data
+          , layEvent = obj.event;
+        if (layEvent === 'del') {
+          layer.confirm('真的删除行么', function (index) {
+            obj.del(); //删除对应行（tr）的DOM结构
+            layer.close(index);
+            $.ajax({
+              type: "get",
+              url: "{{url_for('admin_course_table_updata')}}",
+              data: {
+                'course_id': data.id,
+                'operate': 'del'
+              },
+              contentType: 'application/json',
+              success: function (data) {
+                if (data.code == 0) {
+                  layer.msg('删除成功', { icon: 1 }, { time: 2000 });
+                }
+                else {
+                  layer.msg('删除失败', { icon: 2 }, { time: 2000 });
+                }
+              },
+              error: function (data) {
+                layer.msg('连接网络失败，请检查网络设置或联系管理员', { icon: 2 }, { time: 2000 });
+              }
+            });
+          });
+        }
+        if (layEvent === 'edit') {
+          $.ajax({
+            type: 'get',
+            url: "{{url_for('admin_course_table_updata')}}",
+            data: {
+              'course_id': data.id,
+              'operate': 'edit'
+            },
+            contentType: 'application/json',
+            success: function (data) {
+              console.log('管理员修改课表操作成功');
+            },
+            error: function (data) {
+              layer.msg('连接网络失败，请检查网络设置或联系管理员', { icon: 2 }, { time: 2000 });
+            }
+          });
+          layer.open({
+            type: 2,
+            title: '修改课程信息',
+            shadeClose: false,
+            shade: 0.8,
+            area: ['455px', '550px'],
+            content: "{{url_for('admin_alter_course')}}",
+            scrollbar: false,
+          });
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

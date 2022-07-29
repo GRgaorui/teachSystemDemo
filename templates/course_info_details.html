@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../static/css/layui.css">
+    <link rel="stylesheet" href="../static/css/custom.css">
+    <link rel="stylesheet" href="../static/css/fontastic.css">
+    <link rel="stylesheet" href="../static/css/style.default.css">
+    <link rel="shortcut icon" href="img/favicon.ico">
+    <script src="../static/layui.js"></script>
+    <script src="../static/jquery-3.1.0.min.js"></script>
+    <script>
+        $(function () {
+            $('#print').click(function () {
+                var newstr = document.getElementById("need_print").innerHTML;
+                $('body').children().hide();
+                var imgDom = $(newstr);
+                $('body').append(imgDom);
+                $(".pic").offset({ top: 0, left: 0 });
+                $(".pic").width("100%");
+                $(".pic").height("100%");
+                window.print();
+                $('body').children().show();
+                imgDom.remove();
+            })
+        })
+    </script>
+</head>
+
+<body>
+    <header class="page-header">
+        <div class="container-fluid">
+            <a href="{{url_for('course_info')}}" style="color: black;">
+                <h2 class="no-margin-bottom" id="header_cont"><i class=" layui-icon layui-icon-return">&nbsp;返回</i></h2>
+            </a>
+            <button class="layui-btn" style="float: right;margin-top: -3px;" id="print">打印</button>
+        </div>
+    </header>
+    <div id="need_print">
+        <fieldset class="layui-elem-field layui-field-title">
+            <legend>基本信息</legend>
+        </fieldset>
+        <div style="width: 1000px; margin:-10px auto;">
+            <div>
+                <form class="layui-form" action="" lay-filter="example">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">ID</label>
+                            <div class="layui-input-inline">
+                                <input type="text" autocomplete="off" class="layui-input" value="{{jresult.id}}"
+                                    readonly="readonly">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">课程名称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" autocomplete="off" class="layui-input"
+                                    value="{{jresult.Course_name}}" readonly="readonly">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">学院</label>
+                            <div class="layui-input-inline">
+                                <input type="text" autocomplete="off" class="layui-input"
+                                    value="{{jresult.Course_college}}" readonly="readonly">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">专业</label>
+                            <div class="layui-input-inline">
+                                <input type="text" autocomplete="off" class="layui-input"
+                                    value="{{jresult.Course_major}}" readonly="readonly">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">班级</label>
+                            <div class="layui-input-inline">
+                                <input type="text" autocomplete="off" class="layui-input"
+                                    value="{{jresult.Course_class}}" readonly="readonly">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">授课教师</label>
+                            <div class="layui-input-inline">
+                                <input type="text" autocomplete="off" class="layui-input"
+                                    value="{{jresult.Course_teacher}}" readonly="readonly">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">课程负责人</label>
+                            <div class="layui-input-inline">
+                                <input type="text" autocomplete="off" class="layui-input"
+                                    value="{{jresult.Course_leader}}" readonly="readonly">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">专业负责人</label>
+                            <div class="layui-input-inline">
+                                <input type="text" autocomplete="off" class="layui-input"
+                                    value="{{jresult.Major_leader}}" readonly="readonly">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">状态</label>
+                            <div class="layui-input-inline">
+                                <input type="text" autocomplete="off" class="layui-input"
+                                    value="{{jresult.Course_state}}" readonly="readonly">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">已上传文件</label>
+                        <div class="layui-input-block" style="width: 840px;">
+                            <input type="text" nautocomplete="off" class="layui-input" value="{{upd_file_str}}"
+                                readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">信息</label>
+                        <div class="layui-input-block" style="width: 840px;">
+                            <textarea class="layui-textarea" readonly>{{jresult.info}}</textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

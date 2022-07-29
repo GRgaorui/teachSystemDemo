@@ -1,0 +1,16 @@
+/* your styles go here */
+blockquote {
+    margin-top: 10px;
+}
+
+table {
+    text-align: center;
+}
+
+.layui-table tr th {
+    text-align: center;
+}
+
+.layui_form_style {
+    padding-left: 30px;
+}

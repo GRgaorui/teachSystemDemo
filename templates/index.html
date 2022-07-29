@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>专业认证信息管理系统</title>
+  <link rel="stylesheet" href="../static/css/layui.css">
+  <link rel="stylesheet" href="../static/css/style.default.css">
+</head>
+
+<body class="layui-layout-body">
+  <div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+      <div class="layui-logo" style="color: aliceblue;">专业认证信息管理系统</div>
+      <ul class="layui-nav layui-layout-right">
+        <li class="layui-nav-item"><i class="layui-icon layui-icon-notice"></i></li>
+        <li class="layui-nav-item"><a href="{{ url_for('login') }}" style="font-size: 16px;">退出</a></li>
+      </ul>
+    </div>
+    <div class="layui-side layui-bg-black">
+      <div style="margin-left: 25px;margin-top: 20px;">
+        <div><i class="layui-icon layui-icon-user">&nbsp;<span style="font-size: 19px;">{{username}}</span></i></div>
+        <p style=" margin-left: 15px;margin-top: 7px;font-size:12px;">&nbsp;{{usertype}}</p>
+      </div>
+      <hr class="layui-bg-cyan">
+      <div style="margin-top: 15px;">
+        <ul class="layui-nav layui-nav-tree" lay-filter="demo">
+          {% for active, page ,icon ,left_navigate in left_navigate_vars %}
+          <li class="layui-nav-item {{active}}">
+            <a href="{{ page }}" rel="section" target="right">
+              <i class="layui-icon {{ icon }}" id="cont_side_bar">
+                &nbsp;{{left_navigate}}</i>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="layui-body">
+      <iframe src="{{ url_for(index_in) }}" width="100%" height="100%" name="right" style="position: absolute;top: 0px; border: 0px;"></iframe>
+    </div>
+    <div class="layui-footer" style="background-color: #15171b;">
+      <p style="color: aliceblue;">西安邮电大学 &copy; 2021</p>
+    </div>
+  </div>
+  <script src="../static/layui.js"></script>
+  <script type="text/javascript">
+    //JavaScript代码区域
+    layui.use(['element','jquery'], function () {
+      var element = layui.element,
+      $ = layui.jquery;
+      element.on('nav(demo)', function (data) {
+        $(".layui-nav li").removeClass("layui-this");
+        $(this).addClass("layui-this");
+      });
+    });
+  </script>
+</body>
+
+</html>
